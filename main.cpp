@@ -3,33 +3,32 @@
 
 class base
 {
-public:
-    base()
-    {}
+    public:
+        base()
+        {}
 
-    void operator()(int x)
-    {
-        std::cerr << "Im operator () in Base, x is: " << x << std::endl;
-    }
+        void operator()(int x)
+        {
+            std::cerr << "Im operator () in Base, x is: " << x << std::endl;
+        }
 
-    virtual void print(int x)
-    {
-        std::cerr << "Im Bases print function: " << x << std::endl;
-    }
+        virtual void print(int x)
+        {
+            std::cerr << "Im Bases print function: " << x << std::endl;
+        }
 };
 
 class derived : public base
 {
-public:
-    derived()
-    {}
+    public:
+        derived()
+        {}
 
-    void print(int x)
-    {
-        std::cerr << "Im derived print function: " << x << std::endl;
-    }
+        void print(int x)
+        {
+            std::cerr << "Im derived print function: " << x << std::endl;
+        }
 };
-
 
 void func(int x)
 {
@@ -42,30 +41,29 @@ int main()
     derived d;
     fsx::delegate<void(int)> delegate;
 
-    //Bind lambda
+    // bind lambda
     delegate.bind([](int x){
         std::cerr << "Im lambda: " << x << std::endl;
     });
 
-    //Bind capturing lambda
+    // bind capturing lambda
     delegate.bind([&](int x){
         std::cerr << "Im capturing lambda, Ill call base print function now, btw x is: " << x << std::endl;
         b.print(x);
     });
 
-    //Call operator ()
+    // call operator ()
     delegate.bind(b);
 
-    //Bind basic func
+    // bind basic func
     delegate.bind<&func>();
 
-    //Bind member function
+    // bind member function
     delegate.bind<base, &base::print>(b);
 
-    //Bind derived
+    // bind derived
     delegate.bind<base, &base::print>(d);
 
-    //Invoke and call all
+    // invoke and call all
     delegate.invoke(10);
-    return 0;
 }

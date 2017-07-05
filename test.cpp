@@ -2,65 +2,62 @@
 #include "delegate.hpp"
 #include <catch/catch.hpp>
 
-//Saves results between function calls
 std::vector<int> result;
 
-//Basic class
 class base
 {
-public:
-    base()
-    {}
+    public:
+        base()
+        {}
 
-    void operator()(int x)
-    {
-        result.push_back(x);
-    }
+        void operator()(int x)
+        {
+            result.push_back(x);
+        }
 
-    virtual void print(int x)
-    {
-        result.push_back(x);
-    }
+        virtual void print(int x)
+        {
+            result.push_back(x);
+        }
 
-    virtual ~base()
-    {}
+        virtual ~base()
+        {}
 };
 
-//Derived class
 class derived : public base
 {
-public:
-    derived()
-    {}
+    public:
+        derived()
+        {}
 
-    void print(int x) override
-    {
-        result.push_back(x*2);
-    }
+        void print(int x) override
+        {
+            result.push_back(x*2);
+        }
 
-    void operator()(int x)
-    {
-        result.push_back(x*2);
-    }
+        void operator()(int x)
+        {
+            result.push_back(x*2);
+        }
 };
 
-//Basic function
+// basic function
 void basic_function(int x)
 {
     result.push_back(x*3);
 }
 
-TEST_CASE( "Delegate can bind, invoke and clear" )
+TEST_CASE("Delegate can bind, invoke and clear")
 {
     fsx::delegate<void(int)> delegate;
 
-    SECTION( "Bind 1 function and check count" )
+    SECTION("Bind 1 function and check count")
     {
         delegate.bind<&basic_function>();
         REQUIRE(delegate.size() == 1);
     }
 
-    SECTION( "Bind basic function and invoke it" )
+    SECTION("Bind basic function and invoke it")
     {
         delegate.bind<&basic_function>();
         delegate.invoke(10);
@@ -68,14 +65,14 @@ TEST_CASE( "Delegate can bind, invoke and clear" )
         result.clear();
     }
 
-    SECTION( "Bind basic function and clear the delegate" )
+    SECTION("Bind basic function and clear the delegate")
     {
         delegate.bind<&basic_function>();
         delegate.clear();
         REQUIRE(delegate.size() == 0);
     }
 
-    SECTION ( "Invoke callable Base class operator()" )
+    SECTION("Invoke callable Base class operator()")
     {
         base b;
         delegate.bind(b).invoke(100);
@@ -83,7 +80,7 @@ TEST_CASE( "Delegate can bind, invoke and clear" )
         result.clear();
     }
 
-    SECTION ( "Invoke Derived class Print function through polymorphism" )
+    SECTION("Invoke Derived class Print function through polymorphism")
     {
         derived d;
         delegate.bind<base, &base::print>(d).invoke(100);
@@ -91,7 +88,7 @@ TEST_CASE( "Delegate can bind, invoke and clear" )
         result.clear();
     }
 
-    SECTION ( "Invoke non-capturing lambda" )
+    SECTION("Invoke non-capturing lambda")
     {
         auto lambda = [](int x){
             result.push_back(x*5);
@@ -101,7 +98,7 @@ TEST_CASE( "Delegate can bind, invoke and clear" )
         result.clear();
     }
 
-    SECTION ( "Invoke capturing lambda and call Base print from inside" )
+    SECTION("Invoke capturing lambda and call Base print from inside")
     {
         base b;
         auto lambda = [&](int x){
@@ -114,7 +111,7 @@ TEST_CASE( "Delegate can bind, invoke and clear" )
         result.clear();
     }
 
-    SECTION ( "Invoke capturing lambda and bind function from inside" )
+    SECTION("Invoke capturing lambda and bind function from inside")
     {
         auto lambda = [&delegate](int x){
             result.push_back(x*10);
@@ -128,7 +125,7 @@ TEST_CASE( "Delegate can bind, invoke and clear" )
         result.clear();
     }
 
-    SECTION ( "Bind lambda and do multiple invokes" )
+    SECTION("Bind lambda and do multiple invokes")
     {
         auto lambda = [](int x){
             result.push_back(x*5);
